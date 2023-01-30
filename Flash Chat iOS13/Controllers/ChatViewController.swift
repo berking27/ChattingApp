@@ -26,6 +26,8 @@ class ChatViewController: UIViewController {
          tableView.dataSource = self
          title = K.appName
          navigationItem.hidesBackButton = true //You can hide back button
+         
+         tableView.register(UINib(nibName: K.cellNibName, bundle: nil), forCellReuseIdentifier: K.cellIdentifier)//Go to MessageCell-> Identifier and name it to use here as a identifier.
 
     }
     
@@ -51,7 +53,8 @@ extension ChatViewController : UITableViewDataSource{
      
      func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
           let cell = tableView.dequeueReusableCell(withIdentifier: K.cellIdentifier, for: indexPath)
-          cell.textLabel?.text = "\(messages[indexPath.row].body)"
+               as! MessageCell
+          cell.label.text = messages[indexPath.row].body
           return cell
      }
 }
