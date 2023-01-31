@@ -13,13 +13,11 @@ class ChatViewController: UIViewController {
 
     @IBOutlet weak var tableView: UITableView!
     @IBOutlet weak var messageTextfield: UITextField!
-    
-     var messages : [Message] = [
-          Message(sender: "1@2.com", body: "Hey!"),
-          Message(sender: "a@b.com", body: "Hello!"),
-          Message(sender: "1@2.com", body: "What's up?")
-     ]
      
+     let db = Firestore.firestore()
+    
+     var messages : [Message] = []
+
     override func viewDidLoad() {
         super.viewDidLoad()
          
@@ -28,10 +26,59 @@ class ChatViewController: UIViewController {
          navigationItem.hidesBackButton = true //You can hide back button
          
          tableView.register(UINib(nibName: K.cellNibName, bundle: nil), forCellReuseIdentifier: K.cellIdentifier)//Go to MessageCell-> Identifier and name it to use here as a identifier.
+         
+         loadMessages()
 
     }
+     
+     func loadMessages(){
+          //Instead of AddSnapshotListener we can use getDocumnets but it will only retrieve data once it wont remain updated
+          db.collection(K.FStore.collectionName)
+               .order(by: K.FStore.dateField) //Order the messages by their sending date
+               .addSnapshotListener { [self] (querySnapshot, error) in
+               
+               messages = [] //I declare inside the addSnapshotListener otherwise when ı try to add new message it will show me all messages again and again.
+               
+               if let e = error{
+                    print("There is a issue retrieving data from firestore \(e)")
+               }else{
+                    if let snapshotDocumnets = querySnapshot?.documents{
+                         for doc in snapshotDocumnets {
+                              let data = doc.data()
+                              //I use as? because ı want to change my data type any to String.
+                              if let messageSender = data[K.FStore.senderField] as? String, let messageBody = data[K.FStore.bodyField] as? String {
+                                   let newMessage = Message(sender: messageSender, body: messageBody)
+                                   self.messages.append(newMessage)
+                                   
+                                   DispatchQueue.main.async {//When you try to update View Don't forget use DispatchQueue
+                                        self.tableView.reloadData()
+                                   }
+                                   
+                              }
+                              
+                              
+                         }
+                    }
+               }
+          }
+     }
     
     @IBAction func sendPressed(_ sender: UIButton) {
+         
+         if let messageBody = messageTextfield.text , let messageSender = Auth.auth().currentUser?.email {
+              db.collection(K.FStore.collectionName).addDocument(data: [K.FStore.senderField: messageSender,
+                                                                        K.FStore.bodyField: messageBody,
+                                                                        K.FStore.dateField:Date().timeIntervalSince1970
+                                                                           ]) { (error) in
+                   if let e = error{
+                        print("There was a mistake Saving data to firestore \(e)")
+                   }else{
+                        print("Succesfully saved data.")
+                   }
+              }
+         }
+         
+         
     }
     
      @IBAction func logOutPressed(_ sender: UIBarButtonItem) {
