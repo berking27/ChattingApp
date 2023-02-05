@@ -12,12 +12,26 @@ import CLTypingLabel
 class WelcomeViewController: UIViewController {
 
     @IBOutlet weak var titleLabel: CLTypingLabel!
-    
-    override func viewDidLoad() {
-        super.viewDidLoad()
-
-         titleLabel.text = K.appName
-    }
-    
+     
+     override func viewDidLoad() {
+         super.viewDidLoad()
+          titleLabel.text = K.appName
+//          NavigationDesign().navigationSetting(naviController: self)
+     }
+     
+     
+//     override func viewWillAppear(_ animated: Bool) {
+//          super.viewWillAppear(animated) //When you you use override func you write also super.
+//
+//          navigationController?.isNavigationBarHidden = true
+//
+//     }
+//
+//     override func viewWillDisappear(_ animated: Bool) {
+//          super.viewWillAppear(animated)
+//          navigationController?.isNavigationBarHidden = false
+//     }
+//
+ 
 
 }

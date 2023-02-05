@@ -14,6 +14,12 @@ class RegisterViewController: UIViewController {
      @IBOutlet weak var emailTextfield: UITextField!
      @IBOutlet weak var passwordTextfield: UITextField!
      
+     override func viewDidLoad() {
+         super.viewDidLoad()
+
+          NavigationDesign().navigationSetting(naviController: self) //For Changin Nav Bar
+     }
+     
      @IBAction func registerPressed(_ sender: UIButton) {
           
           if let email = emailTextfield.text , let password = passwordTextfield.text{ //To avoid optional string error
